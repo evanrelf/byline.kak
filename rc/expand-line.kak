@@ -1,7 +1,7 @@
 map global "normal" "x" ": drag-down %%val{count}<ret>"
 map global "normal" "X" ": drag-up %%val{count}<ret>"
 
-define-command drag-down -params 1 %{ evaluate-commands -itersel %{
+define-command -hidden drag-down -params 1 %{ evaluate-commands -itersel %{
   # When selection isn't multi-line, make the selection point forwards
   try %{
     assert-selection-multi-line
@@ -31,7 +31,7 @@ define-command drag-down -params 1 %{ evaluate-commands -itersel %{
   }
 }}
 
-define-command drag-up -params 1 %{ evaluate-commands -itersel %{
+define-command -hidden drag-up -params 1 %{ evaluate-commands -itersel %{
   try %{
     assert-selection-forwards
     assert-selection-multi-line
