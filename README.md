@@ -4,7 +4,7 @@ Expand and shrink line-based selections with `x` and `X`.
 
 ## Installation
 
-### Using [plug.kak](https://github.com/andreyorst/plug.kak) (recommended)
+### Using [plug.kak](https://github.com/robertmeta/plug.kak) (recommended)
 
 With plug.kak installed, add to your `kakrc` file:
 
