@@ -1,5 +1,9 @@
+# Mappings
+
 map global "normal" "x" ": drag-down %%val{count}<ret>"
 map global "normal" "X" ": drag-up %%val{count}<ret>"
+
+# High-level selection expanding and contracting, based on selection direction
 
 define-command -hidden drag-down -params 1 %{ evaluate-commands -itersel %{
   # When selection isn't multi-line, make the selection point forwards
@@ -14,7 +18,7 @@ define-command -hidden drag-down -params 1 %{ evaluate-commands -itersel %{
     try %{
       assert-cursor-end-of-line
       assert-selection-not-reduced
-      grow-below "%arg{1}"
+      expand-below "%arg{1}"
     } catch %{
       # Otherwise, we need to make the initial line selection
       execute-keys "<a-x>"
@@ -23,7 +27,7 @@ define-command -hidden drag-down -params 1 %{ evaluate-commands -itersel %{
     try %{
       assert-cursor-beginning-of-line
       assert-selection-not-reduced
-      shrink-above "%arg{1}"
+      contract-above "%arg{1}"
     } catch %{
       # Otherwise, we need to make the initial line selection
       execute-keys "<a-x><a-;>"
@@ -35,11 +39,13 @@ define-command -hidden drag-up -params 1 %{ evaluate-commands -itersel %{
   try %{
     assert-selection-forwards
     assert-selection-multi-line
-    shrink-below "%arg{1}"
+    contract-below "%arg{1}"
   } catch %{
-    grow-above "%arg{1}"
+    expand-above "%arg{1}"
   }
 }}
+
+# Assertions
 
 define-command -hidden assert-selection-forwards %{
   try %{
@@ -69,7 +75,7 @@ define-command -hidden assert-selection-multi-line %{ evaluate-commands %sh{
 define-command -hidden assert-selection-reduced %{
   # Selections on blank lines are not considered reduced
   execute-keys -draft "<a-K>^$<ret>"
-  # If a selection is 1 character long, it is reduced
+  # Single-character selections are reduced
   execute-keys -draft "<a-k>\A.{,1}\z<ret>"
 }
 
@@ -95,7 +101,9 @@ define-command -hidden assert-cursor-not-end-of-line %{
   execute-keys -draft ";<a-K>$<ret>"
 }
 
-define-command -hidden grow-to-end-of-line %{
+# Low-level selection expanding and contracting primitives
+
+define-command -hidden expand-to-end-of-line %{
   execute-keys "Gl"
   try %{
     assert-cursor-not-end-of-line
@@ -103,20 +111,20 @@ define-command -hidden grow-to-end-of-line %{
   }
 }
 
-define-command -hidden grow-above -params 1 %{
+define-command -hidden expand-above -params 1 %{
   execute-keys "<a-:><a-;>Gh%arg{1}K"
 }
 
-define-command -hidden shrink-above -params 1 %{
+define-command -hidden contract-above -params 1 %{
   execute-keys "<a-:><a-;>Gh%arg{1}J"
 }
 
-define-command -hidden grow-below -params 1 %{
+define-command -hidden expand-below -params 1 %{
   execute-keys "<a-:>%arg{1}J"
-  grow-to-end-of-line
+  expand-to-end-of-line
 }
 
-define-command -hidden shrink-below -params 1 %{
+define-command -hidden contract-below -params 1 %{
   execute-keys "<a-:>%arg{1}K"
-  grow-to-end-of-line
+  expand-to-end-of-line
 }
