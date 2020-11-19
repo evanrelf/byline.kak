@@ -16,7 +16,6 @@ define-command -hidden drag-down -params 0..1 %{ evaluate-commands -itersel %{
   try %{
     assert-selection-forwards
     try %{
-      assert-cursor-end-of-line
       assert-selection-not-reduced
       expand-below "%arg{1}"
     } catch %{
@@ -25,7 +24,6 @@ define-command -hidden drag-down -params 0..1 %{ evaluate-commands -itersel %{
     }
   } catch %{
     try %{
-      assert-cursor-beginning-of-line
       assert-selection-not-reduced
       contract-above "%arg{1}"
     } catch %{
@@ -103,6 +101,10 @@ define-command -hidden assert-cursor-not-end-of-line %{
 
 # Low-level selection expanding and contracting primitives
 
+define-command -hidden expand-to-beginning-of-line %{
+  execute-keys "Gh"
+}
+
 define-command -hidden expand-to-end-of-line %{
   execute-keys "Gl"
   try %{
@@ -112,19 +114,35 @@ define-command -hidden expand-to-end-of-line %{
 }
 
 define-command -hidden expand-above -params 0..1 %{
-  execute-keys "<a-:><a-;>Gh%arg{1}K"
+  execute-keys "<a-:><a-;>"
+  try %{
+    assert-cursor-beginning-of-line
+  } catch %{
+    execute-keys "J"
+  }
+  execute-keys "%arg{1}K"
+  expand-to-beginning-of-line
 }
 
 define-command -hidden contract-above -params 0..1 %{
-  execute-keys "<a-:><a-;>Gh%arg{1}J"
+  execute-keys "<a-:><a-;>"
+  execute-keys "%arg{1}J"
+  expand-to-beginning-of-line
 }
 
 define-command -hidden expand-below -params 0..1 %{
-  execute-keys "<a-:>%arg{1}J"
+  execute-keys "<a-:>"
+  try %{
+    assert-cursor-end-of-line
+  } catch %{
+    execute-keys "K"
+  }
+  execute-keys "%arg{1}J"
   expand-to-end-of-line
 }
 
 define-command -hidden contract-below -params 0..1 %{
-  execute-keys "<a-:>%arg{1}K"
+  execute-keys "<a-:>"
+  execute-keys "%arg{1}K"
   expand-to-end-of-line
 }
