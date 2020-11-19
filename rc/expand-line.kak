@@ -5,7 +5,7 @@ map global "normal" "X" ": drag-up %%val{count}<ret>"
 
 # High-level selection expanding and contracting, based on selection direction
 
-define-command -hidden drag-down -params 1 %{ evaluate-commands -itersel %{
+define-command -hidden drag-down -params 0..1 %{ evaluate-commands -itersel %{
   # When selection isn't multi-line, make the selection point forwards
   try %{
     assert-selection-multi-line
@@ -35,7 +35,7 @@ define-command -hidden drag-down -params 1 %{ evaluate-commands -itersel %{
   }
 }}
 
-define-command -hidden drag-up -params 1 %{ evaluate-commands -itersel %{
+define-command -hidden drag-up -params 0..1 %{ evaluate-commands -itersel %{
   try %{
     assert-selection-forwards
     assert-selection-multi-line
@@ -111,20 +111,20 @@ define-command -hidden expand-to-end-of-line %{
   }
 }
 
-define-command -hidden expand-above -params 1 %{
+define-command -hidden expand-above -params 0..1 %{
   execute-keys "<a-:><a-;>Gh%arg{1}K"
 }
 
-define-command -hidden contract-above -params 1 %{
+define-command -hidden contract-above -params 0..1 %{
   execute-keys "<a-:><a-;>Gh%arg{1}J"
 }
 
-define-command -hidden expand-below -params 1 %{
+define-command -hidden expand-below -params 0..1 %{
   execute-keys "<a-:>%arg{1}J"
   expand-to-end-of-line
 }
 
-define-command -hidden contract-below -params 1 %{
+define-command -hidden contract-below -params 0..1 %{
   execute-keys "<a-:>%arg{1}K"
   expand-to-end-of-line
 }
