@@ -35,17 +35,20 @@ selection.
 
 ## Examples
 
-Press <kbd>x</kbd> to drag the cursor (`|`) down:
+#### Press <kbd>x</kbd> to drag the cursor (`|`) down
 
 <table>
 
 <tr>
+<th>&nbsp;</th>
 <th>&bull; Initial selection</th>
 <th>&rarr; Pressed <kbd>x</kbd></th>
 <th>&rarr; Pressed <kbd>x</kbd></th>
 </tr>
 
 <tr>
+
+<td>Expand downwards</td>
 
 <td>
 
@@ -80,7 +83,54 @@ the lazy dog
 </tr>
 </table>
 
-Press <kbd><a-;></kbd> to swap the cursor (`|`) with the anchor (`[` or `]`):
+<table>
+
+<tr>
+<th>&nbsp;</th>
+<th>&bull; Initial selection</th>
+<th>&rarr; Pressed <kbd>x</kbd></th>
+<th>&rarr; Pressed <kbd>x</kbd></th>
+</tr>
+
+<tr>
+
+<td>Contract downwards</td>
+
+<td>
+
+```
+|The quick brown
+fox jumps over
+the lazy dog]
+```
+
+</td>
+
+<td>
+
+```
+The quick brown
+|fox jumps over
+the lazy dog]
+```
+
+</td>
+
+<td>
+
+```
+The quick brown
+fox jumps over
+|the lazy dog]
+```
+
+</td>
+
+</tr>
+</table>
+
+
+#### Press <kbd><a-;></kbd> to swap the cursor (`|`) with the anchor (`[` or `]`)
 
 <table>
 
@@ -125,17 +175,20 @@ the lazy dog
 </tr>
 </table>
 
-Press <kbd>X</kbd> to drag the cursor (`|`) up:
+#### Press <kbd>X</kbd> to drag the cursor (`|`) up
 
 <table>
 
 <tr>
+<th>&nbsp;</th>
 <th>&bull; Initial selection</th>
 <th>&rarr; Pressed <kbd>X</kbd></th>
 <th>&rarr; Pressed <kbd>X</kbd></th>
 </tr>
 
 <tr>
+
+<td>Expand upwards</td>
 
 <td>
 
@@ -163,6 +216,52 @@ the lazy dog]
 |The quick brown
 fox jumps over
 the lazy dog]
+```
+
+</td>
+
+</tr>
+</table>
+
+<table>
+
+<tr>
+<th>&nbsp;</th>
+<th>&bull; Initial selection</th>
+<th>&rarr; Pressed <kbd>X</kbd></th>
+<th>&rarr; Pressed <kbd>X</kbd></th>
+</tr>
+
+<tr>
+
+<td>Contract upwards</td>
+
+<td>
+
+```
+[The quick brown
+fox jumps over
+the lazy dog|
+```
+
+</td>
+
+<td>
+
+```
+[The quick brown
+fox jumps over|
+the lazy dog
+```
+
+</td>
+
+<td>
+
+```
+[The quick brown|
+fox jumps over
+the lazy dog
 ```
 
 </td>
