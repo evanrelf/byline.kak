@@ -102,14 +102,20 @@ define-command -hidden assert-cursor-not-end-of-line %{
 # Low-level selection expanding and contracting primitives
 
 define-command -hidden expand-to-beginning-of-line %{
-  execute-keys "Gh"
+  try %{
+    assert-cursor-beginning-of-line
+  } catch %{
+    execute-keys "<a-:><a-;>"
+    execute-keys "Gh"
+  }
 }
 
 define-command -hidden expand-to-end-of-line %{
-  execute-keys "Gl"
   try %{
-    assert-cursor-not-end-of-line
-    execute-keys "L"
+    assert-cursor-end-of-line
+  } catch %{
+    execute-keys "<a-:>"
+    execute-keys "GlL"
   }
 }
 
