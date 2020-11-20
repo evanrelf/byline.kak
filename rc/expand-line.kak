@@ -57,10 +57,10 @@ define-command -hidden expand-line-assert-selection-forwards %{
   } catch %{
     evaluate-commands -no-hooks %sh{
       # Otherwise, we need to inspect the selection
-      cursor_row=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 1)
       anchor_row=$(echo "$kak_selection_desc" | cut -d , -f 1 | cut -d . -f 1)
-      cursor_col=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 2)
       anchor_col=$(echo "$kak_selection_desc" | cut -d , -f 1 | cut -d . -f 2)
+      cursor_row=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 1)
+      cursor_col=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 2)
       # If the cursor is behind the anchor, the selection isn't in the forwards
       # direction
       [    $((cursor_col <= anchor_col)) = "1" \
@@ -72,8 +72,8 @@ define-command -hidden expand-line-assert-selection-forwards %{
 
 define-command -hidden expand-line-assert-selection-multi-line %{
   evaluate-commands -no-hooks %sh{
-    cursor_row=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 1)
     anchor_row=$(echo "$kak_selection_desc" | cut -d , -f 1 | cut -d . -f 1)
+    cursor_row=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 1)
     # If the cursor and anchor are on the same row, this isn't a multi-line
     # selection
     [ "$cursor_row" = "$anchor_row" ] && echo "fail"
