@@ -2,6 +2,9 @@
 
 Expand and shrink line-based selections with `x` and `X`.
 
+TL;DR: `x` drags the cursor down, `X` drags the cursor up. See the "Examples"
+section below for a more detailed explanation.
+
 ## Installation
 
 ### Using [plug.kak](https://github.com/robertmeta/plug.kak) (recommended)
