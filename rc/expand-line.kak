@@ -35,10 +35,15 @@ define-command -hidden expand-line-drag-up -params 0..1 %{
       expand-line-expand-above "%arg{1}"
     } catch %{
       try %{
-        expand-line-assert-selection-forwards
-        expand-line-contract-below "%arg{1}"
-      } catch %{
+        expand-line-assert-selection-really-reduced-blank-line
         expand-line-expand-above "%arg{1}"
+      } catch %{
+        try %{
+          expand-line-assert-selection-forwards
+          expand-line-contract-below "%arg{1}"
+        } catch %{
+          expand-line-expand-above "%arg{1}"
+        }
       }
     }
   }
@@ -88,6 +93,11 @@ define-command -hidden expand-line-assert-selection-not-reduced %{
     # If a selection is 2+ characters long, it isn't reduced
     execute-keys -draft "<a-k>.{2,}<ret>"
   }
+}
+
+define-command -hidden expand-line-assert-selection-really-reduced-blank-line %{
+  execute-keys -draft "<a-k>^$<ret>"
+  execute-keys -draft "<a-k>\A.{,1}\z<ret>"
 }
 
 define-command -hidden expand-line-assert-cursor-beginning-of-line %{
