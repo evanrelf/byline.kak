@@ -7,7 +7,6 @@ map global "normal" "X" ": expand-line-drag-up %%val{count}<ret>"
 
 define-command -hidden expand-line-drag-down -params 0..1 %{
   evaluate-commands -itersel -no-hooks %{
-    # When selection isn't multi-line, make the selection point forwards
     try %{
       expand-line-assert-selection-multi-line
     } catch %{
@@ -16,21 +15,9 @@ define-command -hidden expand-line-drag-down -params 0..1 %{
 
     try %{
       expand-line-assert-selection-forwards
-      try %{
-        expand-line-assert-selection-not-reduced
-        expand-line-expand-below "%arg{1}"
-      } catch %{
-        # Otherwise, we need to make the initial line selection
-        execute-keys "<a-x>"
-      }
+      expand-line-expand-below "%arg{1}"
     } catch %{
-      try %{
-        expand-line-assert-selection-not-reduced
-        expand-line-contract-above "%arg{1}"
-      } catch %{
-        # Otherwise, we need to make the initial line selection
-        execute-keys "<a-x><a-;>"
-      }
+      expand-line-contract-above "%arg{1}"
     }
   }
 }
@@ -38,11 +25,21 @@ define-command -hidden expand-line-drag-down -params 0..1 %{
 define-command -hidden expand-line-drag-up -params 0..1 %{
   evaluate-commands -itersel -no-hooks %{
     try %{
-      expand-line-assert-selection-forwards
       expand-line-assert-selection-multi-line
-      expand-line-contract-below "%arg{1}"
     } catch %{
+      execute-keys "<a-:><a-;>"
+    }
+
+    try %{
+      expand-line-assert-selection-reduced
       expand-line-expand-above "%arg{1}"
+    } catch %{
+      try %{
+        expand-line-assert-selection-forwards
+        expand-line-contract-below "%arg{1}"
+      } catch %{
+        expand-line-expand-above "%arg{1}"
+      }
     }
   }
 }
@@ -57,25 +54,21 @@ define-command -hidden expand-line-assert-selection-forwards %{
   } catch %{
     evaluate-commands -no-hooks %sh{
       # Otherwise, we need to inspect the selection
-      anchor_row=$(echo "$kak_selection_desc" | cut -d , -f 1 | cut -d . -f 1)
-      anchor_col=$(echo "$kak_selection_desc" | cut -d , -f 1 | cut -d . -f 2)
-      cursor_row=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 1)
-      cursor_col=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 2)
-      # If the cursor is behind the anchor, the selection isn't in the forwards
-      # direction
-      [    $((cursor_col <= anchor_col)) = "1" \
-        -a $((cursor_row <= anchor_row)) = "1" \
-      ] && echo "fail"
+      cursor_row=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 1)
+      anchor_row=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 1)
+      [ $((cursor_row > anchor_row)) = "1" ] && exit
+      [ $((cursor_row < anchor_row)) = "1" ] && (echo "fail"; exit)
+      anchor_col=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 2)
+      cursor_col=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 2)
+      [ $((cursor_col < anchor_col)) = "1" ] && (echo "fail"; exit)
     }
   }
 }
 
 define-command -hidden expand-line-assert-selection-multi-line %{
   evaluate-commands -no-hooks %sh{
-    anchor_row=$(echo "$kak_selection_desc" | cut -d , -f 1 | cut -d . -f 1)
-    cursor_row=$(echo "$kak_selection_desc" | cut -d , -f 2 | cut -d . -f 1)
-    # If the cursor and anchor are on the same row, this isn't a multi-line
-    # selection
+    anchor_row=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 1)
+    cursor_row=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 1)
     [ "$cursor_row" = "$anchor_row" ] && echo "fail"
   }
 }
@@ -134,6 +127,7 @@ define-command -hidden expand-line-expand-above -params 0..1 %{
   try %{
     expand-line-assert-cursor-beginning-of-line
   } catch %{
+    expand-line-expand-to-end-of-line
     execute-keys "J"
   }
   execute-keys "%arg{1}K"
@@ -151,6 +145,7 @@ define-command -hidden expand-line-expand-below -params 0..1 %{
   try %{
     expand-line-assert-cursor-end-of-line
   } catch %{
+    expand-line-expand-to-beginning-of-line
     execute-keys "K"
   }
   execute-keys "%arg{1}J"
