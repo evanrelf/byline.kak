@@ -1,3 +1,5 @@
+provide-module byline %{
+
 # Mappings
 
 map global "normal" "x" ": byline-drag-down<ret>"
@@ -187,4 +189,6 @@ define-command -hidden byline-contract-below -params 0..1 %{
   execute-keys "<a-:>"
   execute-keys "%val{count}K"
   byline-expand-to-end-of-line
+}
+
 }

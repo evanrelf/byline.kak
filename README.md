@@ -14,7 +14,9 @@ Previously named `expand-line.kak`.
 With plug.kak installed, add to your `kakrc` file:
 
 ```kakoune
-plug "evanrelf/byline.kak"
+plug "evanrelf/byline.kak" config %{
+  require-module "byline"
+}
 ```
 
 ### Manually
@@ -30,6 +32,7 @@ Add to your `kakrc` file:
 
 ```kakoune
 source ~/.config/kak/plugins/byline.kak
+require-module "byline"
 ```
 
 ## Usage
