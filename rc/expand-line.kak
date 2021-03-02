@@ -112,6 +112,10 @@ define-command -hidden expand-line-assert-cursor-not-end-of-line %{
   execute-keys -draft ";<a-K>$<ret>"
 }
 
+define-command -hidden expand-line-assert-no-count %{
+  execute-keys -draft "<space>;%val{count}s.<ret>"
+}
+
 # Low-level selection expanding and contracting primitives
 
 define-command -hidden expand-line-expand-to-beginning-of-line %{
@@ -141,6 +145,11 @@ define-command -hidden expand-line-expand-above -params 0..1 %{
   } catch %{
     expand-line-expand-to-end-of-line
     execute-keys "%val{count}K"
+    try %{
+      expand-line-assert-no-count
+    } catch %{
+      execute-keys "K"
+    }
     execute-keys "J"
   }
   expand-line-expand-to-beginning-of-line
@@ -157,6 +166,11 @@ define-command -hidden expand-line-expand-below -params 0..1 %{
   try %{
     expand-line-assert-selection-reduced
     execute-keys "%val{count}X"
+    try %{
+      expand-line-assert-no-count
+    } catch %{
+      execute-keys "X"
+    }
   } catch %{
     try %{
       expand-line-assert-cursor-end-of-line
