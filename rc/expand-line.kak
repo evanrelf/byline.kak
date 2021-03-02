@@ -3,10 +3,6 @@
 map global "normal" "x" ": expand-line-drag-down %%val{count}<ret>"
 map global "normal" "X" ": expand-line-drag-up %%val{count}<ret>"
 
-# TODO:
-# - Fix incorrect selection when pressing `X` at last line of buffer
-# - Fix incorrect selection when pressing `X` at first character of line
-
 # High-level selection expanding and contracting, based on selection direction
 
 define-command -hidden expand-line-drag-down -params 0..1 %{
@@ -139,12 +135,14 @@ define-command -hidden expand-line-expand-to-end-of-line %{
 define-command -hidden expand-line-expand-above -params 0..1 %{
   execute-keys "<a-:><a-;>"
   try %{
+    expand-line-assert-selection-not-reduced
     expand-line-assert-cursor-beginning-of-line
+    execute-keys "%arg{1}K"
   } catch %{
     expand-line-expand-to-end-of-line
+    execute-keys "%arg{1}K"
     execute-keys "J"
   }
-  execute-keys "%arg{1}K"
   expand-line-expand-to-beginning-of-line
 }
 
