@@ -1,7 +1,7 @@
 # Mappings
 
-map global "normal" "x" ": expand-line-drag-down %%val{count}<ret>"
-map global "normal" "X" ": expand-line-drag-up %%val{count}<ret>"
+map global "normal" "x" ": expand-line-drag-down<ret>"
+map global "normal" "X" ": expand-line-drag-up<ret>"
 
 # High-level selection expanding and contracting, based on selection direction
 
@@ -15,9 +15,9 @@ define-command -hidden expand-line-drag-down -params 0..1 %{
 
     try %{
       expand-line-assert-selection-forwards
-      expand-line-expand-below "%arg{1}"
+      expand-line-expand-below
     } catch %{
-      expand-line-contract-above "%arg{1}"
+      expand-line-contract-above
     }
   }
 }
@@ -32,17 +32,17 @@ define-command -hidden expand-line-drag-up -params 0..1 %{
 
     try %{
       expand-line-assert-selection-reduced
-      expand-line-expand-above "%arg{1}"
+      expand-line-expand-above
     } catch %{
       try %{
         expand-line-assert-selection-really-reduced-blank-line
-        expand-line-expand-above "%arg{1}"
+        expand-line-expand-above
       } catch %{
         try %{
           expand-line-assert-selection-forwards
-          expand-line-contract-below "%arg{1}"
+          expand-line-contract-below
         } catch %{
-          expand-line-expand-above "%arg{1}"
+          expand-line-expand-above
         }
       }
     }
@@ -137,10 +137,10 @@ define-command -hidden expand-line-expand-above -params 0..1 %{
   try %{
     expand-line-assert-selection-not-reduced
     expand-line-assert-cursor-beginning-of-line
-    execute-keys "%arg{1}K"
+    execute-keys "%val{count}K"
   } catch %{
     expand-line-expand-to-end-of-line
-    execute-keys "%arg{1}K"
+    execute-keys "%val{count}K"
     execute-keys "J"
   }
   expand-line-expand-to-beginning-of-line
@@ -148,7 +148,7 @@ define-command -hidden expand-line-expand-above -params 0..1 %{
 
 define-command -hidden expand-line-contract-above -params 0..1 %{
   execute-keys "<a-:><a-;>"
-  execute-keys "%arg{1}J"
+  execute-keys "%val{count}J"
   expand-line-expand-to-beginning-of-line
 }
 
@@ -156,7 +156,7 @@ define-command -hidden expand-line-expand-below -params 0..1 %{
   execute-keys "<a-:>"
   try %{
     expand-line-assert-selection-reduced
-    execute-keys "%arg{1}X"
+    execute-keys "%val{count}X"
   } catch %{
     try %{
       expand-line-assert-cursor-end-of-line
@@ -164,13 +164,13 @@ define-command -hidden expand-line-expand-below -params 0..1 %{
       expand-line-expand-to-beginning-of-line
       execute-keys "K"
     }
-    execute-keys "%arg{1}J"
+    execute-keys "%val{count}J"
     expand-line-expand-to-end-of-line
   }
 }
 
 define-command -hidden expand-line-contract-below -params 0..1 %{
   execute-keys "<a-:>"
-  execute-keys "%arg{1}K"
+  execute-keys "%val{count}K"
   expand-line-expand-to-end-of-line
 }
