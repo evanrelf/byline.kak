@@ -1,48 +1,48 @@
 # Mappings
 
-map global "normal" "x" ": expand-line-drag-down<ret>"
-map global "normal" "X" ": expand-line-drag-up<ret>"
+map global "normal" "x" ": byline-drag-down<ret>"
+map global "normal" "X" ": byline-drag-up<ret>"
 
 # High-level selection expanding and contracting, based on selection direction
 
-define-command -hidden expand-line-drag-down -params 0..1 %{
+define-command -hidden byline-drag-down -params 0..1 %{
   evaluate-commands -itersel -no-hooks %{
     try %{
-      expand-line-assert-selection-multi-line
+      byline-assert-selection-multi-line
     } catch %{
       execute-keys "<a-:>"
     }
 
     try %{
-      expand-line-assert-selection-forwards
-      expand-line-expand-below
+      byline-assert-selection-forwards
+      byline-expand-below
     } catch %{
-      expand-line-contract-above
+      byline-contract-above
     }
   }
 }
 
-define-command -hidden expand-line-drag-up -params 0..1 %{
+define-command -hidden byline-drag-up -params 0..1 %{
   evaluate-commands -itersel -no-hooks %{
     try %{
-      expand-line-assert-selection-multi-line
+      byline-assert-selection-multi-line
     } catch %{
       execute-keys "<a-:><a-;>"
     }
 
     try %{
-      expand-line-assert-selection-reduced
-      expand-line-expand-above
+      byline-assert-selection-reduced
+      byline-expand-above
     } catch %{
       try %{
-        expand-line-assert-selection-really-reduced-blank-line
-        expand-line-expand-above
+        byline-assert-selection-really-reduced-blank-line
+        byline-expand-above
       } catch %{
         try %{
-          expand-line-assert-selection-forwards
-          expand-line-contract-below
+          byline-assert-selection-forwards
+          byline-contract-below
         } catch %{
-          expand-line-expand-above
+          byline-expand-above
         }
       }
     }
@@ -51,11 +51,11 @@ define-command -hidden expand-line-drag-up -params 0..1 %{
 
 # Assertions
 
-define-command -hidden expand-line-assert-selection-forwards %{
+define-command -hidden byline-assert-selection-forwards %{
   try %{
     # If the selection is just the cursor, we treat it as being in the forwards
     # direction, and can exit early
-    expand-line-assert-selection-reduced
+    byline-assert-selection-reduced
   } catch %{
     evaluate-commands -no-hooks %sh{
       # Otherwise, we need to inspect the selection
@@ -70,7 +70,7 @@ define-command -hidden expand-line-assert-selection-forwards %{
   }
 }
 
-define-command -hidden expand-line-assert-selection-multi-line %{
+define-command -hidden byline-assert-selection-multi-line %{
   evaluate-commands -no-hooks %sh{
     anchor_row=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 1)
     cursor_row=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 1)
@@ -78,14 +78,14 @@ define-command -hidden expand-line-assert-selection-multi-line %{
   }
 }
 
-define-command -hidden expand-line-assert-selection-reduced %{
+define-command -hidden byline-assert-selection-reduced %{
   # Selections on blank lines are not considered reduced
   execute-keys -draft "<a-K>^$<ret>"
   # Single-character selections are reduced
   execute-keys -draft "<a-k>\A.{,1}\z<ret>"
 }
 
-define-command -hidden expand-line-assert-selection-not-reduced %{
+define-command -hidden byline-assert-selection-not-reduced %{
   try %{
     # Selections on blank lines are not considered reduced
     execute-keys -draft "<a-k>^$<ret>"
@@ -95,96 +95,96 @@ define-command -hidden expand-line-assert-selection-not-reduced %{
   }
 }
 
-define-command -hidden expand-line-assert-selection-really-reduced-blank-line %{
+define-command -hidden byline-assert-selection-really-reduced-blank-line %{
   execute-keys -draft "<a-k>^$<ret>"
   execute-keys -draft "<a-k>\A.{,1}\z<ret>"
 }
 
-define-command -hidden expand-line-assert-cursor-beginning-of-line %{
+define-command -hidden byline-assert-cursor-beginning-of-line %{
   execute-keys -draft ";<a-k>^<ret>"
 }
 
-define-command -hidden expand-line-assert-cursor-end-of-line %{
+define-command -hidden byline-assert-cursor-end-of-line %{
   execute-keys -draft ";<a-k>$<ret>"
 }
 
-define-command -hidden expand-line-assert-cursor-not-end-of-line %{
+define-command -hidden byline-assert-cursor-not-end-of-line %{
   execute-keys -draft ";<a-K>$<ret>"
 }
 
-define-command -hidden expand-line-assert-no-count %{
+define-command -hidden byline-assert-no-count %{
   execute-keys -draft "<space>;%val{count}s.<ret>"
 }
 
 # Low-level selection expanding and contracting primitives
 
-define-command -hidden expand-line-expand-to-beginning-of-line %{
+define-command -hidden byline-expand-to-beginning-of-line %{
   try %{
-    expand-line-assert-cursor-beginning-of-line
+    byline-assert-cursor-beginning-of-line
   } catch %{
     execute-keys "<a-:><a-;>"
     execute-keys "Gh"
   }
 }
 
-define-command -hidden expand-line-expand-to-end-of-line %{
+define-command -hidden byline-expand-to-end-of-line %{
   try %{
-    expand-line-assert-cursor-end-of-line
+    byline-assert-cursor-end-of-line
   } catch %{
     execute-keys "<a-:>"
     execute-keys "GlL"
   }
 }
 
-define-command -hidden expand-line-expand-above -params 0..1 %{
+define-command -hidden byline-expand-above -params 0..1 %{
   execute-keys "<a-:><a-;>"
   try %{
-    expand-line-assert-selection-not-reduced
-    expand-line-assert-cursor-beginning-of-line
+    byline-assert-selection-not-reduced
+    byline-assert-cursor-beginning-of-line
     execute-keys "%val{count}K"
   } catch %{
-    expand-line-expand-to-end-of-line
+    byline-expand-to-end-of-line
     execute-keys "%val{count}K"
     try %{
-      expand-line-assert-no-count
+      byline-assert-no-count
     } catch %{
       execute-keys "K"
     }
     execute-keys "J"
   }
-  expand-line-expand-to-beginning-of-line
+  byline-expand-to-beginning-of-line
 }
 
-define-command -hidden expand-line-contract-above -params 0..1 %{
+define-command -hidden byline-contract-above -params 0..1 %{
   execute-keys "<a-:><a-;>"
   execute-keys "%val{count}J"
-  expand-line-expand-to-beginning-of-line
+  byline-expand-to-beginning-of-line
 }
 
-define-command -hidden expand-line-expand-below -params 0..1 %{
+define-command -hidden byline-expand-below -params 0..1 %{
   execute-keys "<a-:>"
   try %{
-    expand-line-assert-selection-reduced
+    byline-assert-selection-reduced
     execute-keys "%val{count}X"
     try %{
-      expand-line-assert-no-count
+      byline-assert-no-count
     } catch %{
       execute-keys "X"
     }
   } catch %{
     try %{
-      expand-line-assert-cursor-end-of-line
+      byline-assert-cursor-end-of-line
     } catch %{
-      expand-line-expand-to-beginning-of-line
+      byline-expand-to-beginning-of-line
       execute-keys "K"
     }
     execute-keys "%val{count}J"
-    expand-line-expand-to-end-of-line
+    byline-expand-to-end-of-line
   }
 }
 
-define-command -hidden expand-line-contract-below -params 0..1 %{
+define-command -hidden byline-contract-below -params 0..1 %{
   execute-keys "<a-:>"
   execute-keys "%val{count}K"
-  expand-line-expand-to-end-of-line
+  byline-expand-to-end-of-line
 }

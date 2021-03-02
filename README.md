@@ -1,9 +1,11 @@
-# expand-line.kak
+# byline.kak
 
 Expand and shrink line-based selections with `x` and `X`.
 
 TL;DR: `x` drags the cursor down, `X` drags the cursor up. See the "Examples"
 section below for a more detailed explanation.
+
+Previously named `expand-line.kak`.
 
 ## Installation
 
@@ -12,7 +14,7 @@ section below for a more detailed explanation.
 With plug.kak installed, add to your `kakrc` file:
 
 ```kakoune
-plug "evanrelf/expand-line.kak"
+plug "evanrelf/byline.kak"
 ```
 
 ### Manually
@@ -21,13 +23,13 @@ Download plugin:
 
 ```bash
 $ mkdir -p ~/.config/kak/plugins/
-$ curl -L https://raw.githubusercontent.com/evanrelf/expand-line.kak/main/rc/expand-line.kak -o ~/.config/kak/plugins/expand-line.kak
+$ curl -L https://raw.githubusercontent.com/evanrelf/byline.kak/main/rc/byline.kak -o ~/.config/kak/plugins/byline.kak
 ```
 
 Add to your `kakrc` file:
 
 ```kakoune
-source ~/.config/kak/plugins/expand-line.kak
+source ~/.config/kak/plugins/byline.kak
 ```
 
 ## Usage
