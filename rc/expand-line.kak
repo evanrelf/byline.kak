@@ -4,9 +4,7 @@ map global "normal" "x" ": expand-line-drag-down %%val{count}<ret>"
 map global "normal" "X" ": expand-line-drag-up %%val{count}<ret>"
 
 # TODO:
-# - Fix incorrect selection when pressing `x` at first line of buffer
 # - Fix incorrect selection when pressing `X` at last line of buffer
-# - Fix incorrect selection when pressing `x` at last character of line
 # - Fix incorrect selection when pressing `X` at first character of line
 
 # High-level selection expanding and contracting, based on selection direction
@@ -159,13 +157,18 @@ define-command -hidden expand-line-contract-above -params 0..1 %{
 define-command -hidden expand-line-expand-below -params 0..1 %{
   execute-keys "<a-:>"
   try %{
-    expand-line-assert-cursor-end-of-line
+    expand-line-assert-selection-reduced
+    execute-keys "%arg{1}X"
   } catch %{
-    expand-line-expand-to-beginning-of-line
-    execute-keys "K"
+    try %{
+      expand-line-assert-cursor-end-of-line
+    } catch %{
+      expand-line-expand-to-beginning-of-line
+      execute-keys "K"
+    }
+    execute-keys "%arg{1}J"
+    expand-line-expand-to-end-of-line
   }
-  execute-keys "%arg{1}J"
-  expand-line-expand-to-end-of-line
 }
 
 define-command -hidden expand-line-contract-below -params 0..1 %{
