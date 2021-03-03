@@ -2,6 +2,16 @@ source "%opt{kak_spec_source_dir}/../rc/byline.kak"
 require-module "byline"
 
 ################################################################################
+# byline-assert-selection-forwards
+
+# TODO
+
+################################################################################
+# byline-assert-selection-multi-line
+
+# TODO
+
+################################################################################
 # byline-assert-selection-reduced
 
 kak-spec \
@@ -87,3 +97,23 @@ kak-spec \
     byline-assert-selection-really-reduced-blank-line
   } \
   -expect-%val(error) "regex(.+)"
+
+################################################################################
+# byline-assert-cursor-beginning-of-line
+
+# TODO
+
+################################################################################
+# byline-assert-cursor-end-of-line
+
+# TODO
+
+################################################################################
+# byline-assert-cursor-not-end-of-line
+
+# TODO
+
+################################################################################
+# byline-assert-no-count
+
+# TODO
