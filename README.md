@@ -24,8 +24,7 @@ plug "evanrelf/byline.kak" config %{
 Download plugin:
 
 ```bash
-$ mkdir -p ~/.config/kak/plugins/
-$ curl -L https://raw.githubusercontent.com/evanrelf/byline.kak/main/rc/byline.kak -o ~/.config/kak/plugins/byline.kak
+$ curl -L https://raw.githubusercontent.com/evanrelf/byline.kak/main/rc/byline.kak -o ~/.config/kak/plugins/byline.kak --create-dirs
 ```
 
 Add to your `kakrc` file:
