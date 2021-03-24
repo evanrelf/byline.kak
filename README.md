@@ -9,7 +9,7 @@ Previously named `expand-line.kak`.
 
 ## Installation
 
-### Using [plug.kak](https://github.com/robertmeta/plug.kak) (recommended)
+### Using [plug.kak](https://github.com/andreyorst/plug.kak) (recommended)
 
 With plug.kak installed, add to your `kakrc` file:
 
