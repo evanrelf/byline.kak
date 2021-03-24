@@ -1,9 +1,9 @@
 # byline.kak
 
-Expand and shrink line-based selections with `x` and `X`.
+Expand and shrink line-based selections with <kbd>x</kbd> and <kbd>X</kbd>.
 
-TL;DR: `x` drags the cursor down, `X` drags the cursor up. See the "Examples"
-section below for a more detailed explanation.
+TL;DR: <kbd>x</kbd> drags the cursor down, <kbd>X</kbd> drags the cursor up. See
+the "Examples" section below for a more detailed explanation.
 
 Previously named `expand-line.kak`.
 
@@ -36,9 +36,9 @@ require-module "byline"
 
 ## Usage
 
-Use `x` and `X` to drag the cursor down and up by lines, respectively. This
-expands or contracts your selection by lines, based on the direction of your
-selection.
+Use <kbd>x</kbd> and <kbd>X</kbd> to drag the cursor down and up by lines,
+respectively. This expands or contracts your selection by lines, based on the
+direction of your selection.
 
 ## Examples
 
