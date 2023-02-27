@@ -7,14 +7,8 @@ map global "normal" "X" ": byline-drag-up<ret>"
 
 # High-level selection expanding and contracting, based on selection direction
 
-define-command -hidden byline-drag-down -params 0..1 %{
+define-command -hidden byline-drag-down %{
   evaluate-commands -itersel -no-hooks %{
-    try %{
-      byline-assert-selection-multi-line
-    } catch %{
-      execute-keys "<a-:>"
-    }
-
     try %{
       byline-assert-selection-forwards
       byline-expand-below
@@ -24,61 +18,18 @@ define-command -hidden byline-drag-down -params 0..1 %{
   }
 }
 
-define-command -hidden byline-drag-up -params 0..1 %{
+define-command -hidden byline-drag-up %{
   evaluate-commands -itersel -no-hooks %{
     try %{
-      byline-assert-selection-multi-line
+      byline-assert-selection-forwards
+      byline-contract-below
     } catch %{
-      execute-keys "<a-:><a-;>"
-    }
-
-    try %{
-      byline-assert-selection-reduced
       byline-expand-above
-    } catch %{
-      try %{
-        byline-assert-selection-really-reduced-blank-line
-        byline-expand-above
-      } catch %{
-        try %{
-          byline-assert-selection-forwards
-          byline-contract-below
-        } catch %{
-          byline-expand-above
-        }
-      }
     }
   }
 }
 
 # Assertions
-
-define-command -hidden byline-assert-selection-forwards %{
-  try %{
-    # If the selection is just the cursor, we treat it as being in the forwards
-    # direction, and can exit early
-    byline-assert-selection-reduced
-  } catch %{
-    evaluate-commands -no-hooks %sh{
-      # Otherwise, we need to inspect the selection
-      cursor_row=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 1)
-      anchor_row=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 1)
-      [ $((cursor_row > anchor_row)) = "1" ] && exit
-      [ $((cursor_row < anchor_row)) = "1" ] && (echo "fail"; exit)
-      anchor_col=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 2)
-      cursor_col=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 2)
-      [ $((cursor_col < anchor_col)) = "1" ] && (echo "fail"; exit)
-    }
-  }
-}
-
-define-command -hidden byline-assert-selection-multi-line %{
-  evaluate-commands -no-hooks %sh{
-    anchor_row=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 1)
-    cursor_row=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 1)
-    [ "$cursor_row" = "$anchor_row" ] && echo "fail"
-  }
-}
 
 define-command -hidden byline-assert-selection-reduced %{
   # Selections on blank lines are not considered reduced
@@ -87,108 +38,98 @@ define-command -hidden byline-assert-selection-reduced %{
   execute-keys -draft "<a-k>\A.{,1}\z<ret>"
 }
 
-define-command -hidden byline-assert-selection-not-reduced %{
+define-command -hidden byline-assert-selection-forwards %{
   try %{
-    # Selections on blank lines are not considered reduced
-    execute-keys -draft "<a-k>^$<ret>"
+    # If the selection is just the cursor, we treat it as being in the forwards
+    # direction, and can exit early
+    byline-assert-selection-reduced
   } catch %{
-    # If a selection is 2+ characters long, it isn't reduced
-    execute-keys -draft "<a-k>.{2,}<ret>"
+    # Otherwise, we need to inspect the selection
+    evaluate-commands -no-hooks %sh{
+      cursor_row=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 1)
+      anchor_row=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 1)
+      [ "$cursor_row" -gt "$anchor_row" ] && exit
+      [ "$cursor_row" -lt "$anchor_row" ] && (echo "fail"; exit)
+      anchor_col=$(echo "$kak_selection_desc" | cut -d "," -f 1 | cut -d "." -f 2)
+      cursor_col=$(echo "$kak_selection_desc" | cut -d "," -f 2 | cut -d "." -f 2)
+      [ "$cursor_col" -lt "$anchor_col" ] && (echo "fail"; exit)
+    }
   }
 }
 
-define-command -hidden byline-assert-selection-really-reduced-blank-line %{
-  execute-keys -draft "<a-k>^$<ret>"
-  execute-keys -draft "<a-k>\A.{,1}\z<ret>"
-}
-
-define-command -hidden byline-assert-cursor-beginning-of-line %{
-  execute-keys -draft ";<a-k>^<ret>"
-}
-
-define-command -hidden byline-assert-cursor-end-of-line %{
-  execute-keys -draft ";<a-k>$<ret>"
-}
-
-define-command -hidden byline-assert-cursor-not-end-of-line %{
-  execute-keys -draft ";<a-K>$<ret>"
-}
-
-define-command -hidden byline-assert-no-count %{
-  execute-keys -draft "<space>;%val{count}s.<ret>"
+define-command -hidden byline-assert-selection-full-lines %{
+  # Starts at beginning of line
+  execute-keys -draft "<a-:><a-;>;<a-k>\A^<ret>"
+  # Ends at end of line
+  execute-keys -draft "<a-:>;<a-k>$<ret>"
 }
 
 # Low-level selection expanding and contracting primitives
 
-define-command -hidden byline-expand-to-beginning-of-line %{
+define-command -hidden byline-expand-above %{
   try %{
-    byline-assert-cursor-beginning-of-line
+    byline-assert-selection-full-lines
+    execute-keys "<a-:><a-;>%val{count}Kx"
   } catch %{
+    execute-keys "x<a-:><a-;>"
+    evaluate-commands -no-hooks %sh{
+      if [ "$kak_count" -gt 1 ]; then
+        echo "execute-keys '$((kak_count - 1))Kx'"
+      fi
+    }
+  }
+}
+
+define-command -hidden byline-contract-above %{
+  try %{
+    byline-assert-selection-full-lines
+    execute-keys "<a-:><a-;>%val{count}Jx"
+  } catch %{
+    try %{
+      execute-keys "<a-x>"
+    } catch %{
+      execute-keys "x"
+    }
     execute-keys "<a-:><a-;>"
-    execute-keys "Gh"
+    evaluate-commands -no-hooks %sh{
+      if [ "$kak_count" -gt 1 ]; then
+        echo "execute-keys '$((kak_count - 1))Jx'"
+      fi
+    }
   }
 }
 
-define-command -hidden byline-expand-to-end-of-line %{
+define-command -hidden byline-expand-below %{
   try %{
-    byline-assert-cursor-end-of-line
+    byline-assert-selection-full-lines
+    execute-keys "<a-:>%val{count}Jx"
   } catch %{
+    execute-keys "x<a-:>"
+    evaluate-commands -no-hooks %sh{
+      if [ "$kak_count" -gt 1 ]; then
+        echo "execute-keys '$((kak_count - 1))Jx'"
+      fi
+    }
+  }
+}
+
+define-command -hidden byline-contract-below %{
+  try %{
+    byline-assert-selection-full-lines
+    execute-keys "<a-:>%val{count}Kx"
+  } catch %{
+    try %{
+      execute-keys "<a-x>"
+    } catch %{
+      execute-keys "x"
+    }
     execute-keys "<a-:>"
-    execute-keys "GlL"
-  }
-}
-
-define-command -hidden byline-expand-above -params 0..1 %{
-  execute-keys "<a-:><a-;>"
-  try %{
-    byline-assert-selection-not-reduced
-    byline-assert-cursor-beginning-of-line
-    execute-keys "%val{count}K"
-  } catch %{
-    byline-expand-to-end-of-line
-    execute-keys "%val{count}K"
-    try %{
-      byline-assert-no-count
-    } catch %{
-      execute-keys "K"
+    evaluate-commands -no-hooks %sh{
+      if [ "$kak_count" -gt 1 ]; then
+        echo "execute-keys '$((kak_count - 1))Kx'"
+      fi
     }
-    execute-keys "J"
   }
-  byline-expand-to-beginning-of-line
-}
-
-define-command -hidden byline-contract-above -params 0..1 %{
-  execute-keys "<a-:><a-;>"
-  execute-keys "%val{count}J"
-  byline-expand-to-beginning-of-line
-}
-
-define-command -hidden byline-expand-below -params 0..1 %{
-  execute-keys "<a-:>"
-  try %{
-    byline-assert-selection-reduced
-    execute-keys "%val{count}X"
-    try %{
-      byline-assert-no-count
-    } catch %{
-      execute-keys "X"
-    }
-  } catch %{
-    try %{
-      byline-assert-cursor-end-of-line
-    } catch %{
-      byline-expand-to-beginning-of-line
-      execute-keys "K"
-    }
-    execute-keys "%val{count}J"
-    byline-expand-to-end-of-line
-  }
-}
-
-define-command -hidden byline-contract-below -params 0..1 %{
-  execute-keys "<a-:>"
-  execute-keys "%val{count}K"
-  byline-expand-to-end-of-line
 }
 
 }
